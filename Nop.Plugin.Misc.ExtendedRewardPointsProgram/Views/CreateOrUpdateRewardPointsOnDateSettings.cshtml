@@ -1,0 +1,108 @@
+﻿@using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
+@using Nop.Web.Framework
+@model RewardPointsOnDateModel
+
+@{
+    Layout = "~/Administration/Views/Shared/_AdminPopupLayout.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @(Model.Id > 0 ? T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.AddNew") : T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Edit"))
+        </h1>
+        <div class="pull-right">
+            <button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>
+        </div>
+    </div>
+   
+    @Html.ValidationSummary(false)
+    @Html.HiddenFor(model => model.Id)
+
+    if (ViewBag.RefreshPage == true)
+    {
+        <script type="text/javascript">
+            try { $("#@(ViewBag.btnId)", window.opener.document).click(); }
+            catch (e){}
+            window.close();
+        </script>
+    }
+
+    <div class="content">
+        <div class="form-horizontal">
+            <div class="panel-group">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                @Html.NopLabelFor(model => model.AwardingDateUtc)
+                            </div>
+                            <div class="col-md-9">
+                                @Html.NopEditorFor(model => model.AwardingDateUtc)
+                                @Html.ValidationMessageFor(model => model.AwardingDateUtc)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                @Html.NopLabelFor(model => model.Points)
+                            </div>
+                            <div class="col-md-9">
+                                @Html.NopEditorFor(model => model.Points)
+                                @Html.ValidationMessageFor(model => model.Points)
+                            </div>
+                        </div>
+                        <div class="form-group" @(Model.AvailableStores.SelectionIsNotPossible() ? Html.Raw("style=\"display:none\"") : null)>
+                            <div class="col-md-3">
+                                @Html.NopLabelFor(model => model.StoreId)
+                            </div>
+                            <div class="col-md-9">
+                                @Html.NopDropDownListFor(model => model.StoreId, Model.AvailableStores)
+                                @Html.ValidationMessageFor(model => model.StoreId)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                @Html.NopLabelFor(model => model.CustomerRoleId)
+                            </div>
+                            <div class="col-md-9">
+                                @Html.NopDropDownListFor(model => model.CustomerRoleId, Model.AvailableCustomerRoles)
+                                @Html.ValidationMessageFor(model => model.CustomerRoleId)
+                            </div>
+                        </div>
+                        @(Html.LocalizedEditor<RewardPointsOnDateModel, LocalizedModel>("settings-on-date-localized",
+                            @<div>
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        @Html.NopLabelFor(model => model.Locales[item].Message)
+                                    </div>
+                                    <div class="col-md-9">
+                                        @Html.NopTextAreaFor(model => model.Locales[item].Message)
+                                        @Html.ValidationMessageFor(model => model.Locales[item].Message)
+                                    </div>
+                                </div>
+                                @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                            </div>
+                            ,
+                            @<div>
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        @Html.NopLabelFor(model => model.Message)
+                                    </div>
+                                    <div class="col-md-9">
+                                        @Html.NopTextAreaFor(model => model.Message)
+                                        @Html.ValidationMessageFor(model => model.Message)
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

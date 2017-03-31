@@ -1,0 +1,124 @@
+﻿@using Nop.Core.Domain.Customers
+@using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
+@using Nop.Services
+@using Nop.Web.Framework
+@model RewardPointsModel
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        @Model.Title
+    </div>
+    <div class="panel-body">
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("#@Html.FieldIdFor(model => model.IsEnabled)").click(function () {
+                    $("#@ViewData.TemplateInfo.HtmlFieldPrefix").toggle();
+                });
+                if (!$("#@Html.FieldIdFor(model => model.IsEnabled)").is(':checked'))
+                    $("#@ViewData.TemplateInfo.HtmlFieldPrefix").hide();
+
+                $("#@Html.FieldIdFor(model => model.ActivatePointsImmediately)").click(function () {
+                    $("#@ViewData.TemplateInfo.HtmlFieldPrefix-activation-delay").toggle();
+                });
+                if ($("#@Html.FieldIdFor(model => model.ActivatePointsImmediately)").is(':checked'))
+                    $("#@ViewData.TemplateInfo.HtmlFieldPrefix-activation-delay").hide();
+            });
+        </script>
+        
+        <p>@Model.Description</p>
+
+        <div class="form-group">
+            <div class="col-md-3">
+                @Html.OverrideStoreCheckboxFor(model => model.IsEnabled_OverrideForStore, model => model.IsEnabled, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.IsEnabled)
+            </div>
+            <div class="col-md-9">
+                @Html.NopEditorFor(model => model.IsEnabled)
+                @Html.ValidationMessageFor(model => model.IsEnabled)
+            </div>
+        </div>
+        <div id="@ViewData.TemplateInfo.HtmlFieldPrefix">
+            <div class="form-group">
+                <div class="col-md-3">
+                    @Html.OverrideStoreCheckboxFor(model => model.Points_OverrideForStore, model => model.Points, Model.ActiveStoreScopeConfiguration)
+                    @Html.NopLabelFor(model => model.Points)
+                </div>
+                <div class="col-md-9">
+                    @Html.NopEditorFor(model => model.Points)
+                    @Html.ValidationMessageFor(model => model.Points)
+                </div>
+            </div>
+            @if (Model is RewardPointsForFastPurchaseModel)
+            {
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @Html.OverrideStoreCheckboxFor(model => ((RewardPointsForFastPurchaseModel)model).Minutes_OverrideForStore, model => ((RewardPointsForFastPurchaseModel)model).Minutes, Model.ActiveStoreScopeConfiguration)
+                        @Html.NopLabelFor(model => ((RewardPointsForFastPurchaseModel)model).Minutes)
+                    </div>
+                    <div class="col-md-9">
+                        @Html.NopEditorFor(model => ((RewardPointsForFastPurchaseModel)model).Minutes)
+                        @Html.ValidationMessageFor(model => ((RewardPointsForFastPurchaseModel)model).Minutes)
+                    </div>
+                </div>
+            }
+            <div class="form-group">
+                <div class="col-md-3">
+                    @Html.NopLabelFor(model => model.ActivatePointsImmediately)
+                </div>
+                <div class="col-md-9">
+                    @Html.NopEditorFor(model => model.ActivatePointsImmediately)
+                    @Html.ValidationMessageFor(model => model.ActivatePointsImmediately)
+                </div>
+            </div>
+            <div class="form-group" id="@ViewData.TemplateInfo.HtmlFieldPrefix-activation-delay">
+                <div class="col-md-3">
+                    @Html.OverrideStoreCheckboxFor(model => model.ActivationDelay_OverrideForStore, model => model.ActivationDelay, Model.ActiveStoreScopeConfiguration)
+                    @Html.NopLabelFor(model => model.ActivationDelay)
+                </div>
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-3">
+                            @Html.NopEditorFor(model => model.ActivationDelay)
+                            @Html.ValidationMessageFor(model => model.ActivationDelay)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.NopDropDownListFor(model => model.ActivationDelayPeriodId, ((RewardPointsActivatingDelayPeriod)Model.ActivationDelayPeriodId).ToSelectList(), new { style = "max-width: 200px;" })
+                            @Html.ValidationMessageFor(model => model.ActivationDelayPeriodId)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @(Html.LocalizedEditor<RewardPointsModel, LocalizedModel>(ViewData.TemplateInfo.HtmlFieldPrefix + "-localized",
+                @<div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.OverrideStoreCheckboxFor(model => model.Message_OverrideForStore, model => model.Locales[item].Message, Model.ActiveStoreScopeConfiguration)
+                            @Html.NopLabelFor(model => model.Locales[item].Message)
+                        </div>
+                        <div class="col-md-9">
+                            @Html.NopTextAreaFor(model => model.Locales[item].Message)
+                            @Html.ValidationMessageFor(model => model.Locales[item].Message)
+                        </div>
+                    </div>
+                    @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                </div>
+                ,
+                @<div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.OverrideStoreCheckboxFor(model => model.Message_OverrideForStore, model => model.Message, Model.ActiveStoreScopeConfiguration)
+                            @Html.NopLabelFor(model => model.Message)
+                        </div>
+                        <div class="col-md-9">
+                            @Html.NopTextAreaFor(model => model.Message)
+                            @Html.ValidationMessageFor(model => model.Message)
+                        </div>
+                    </div>
+                </div>
+                ,
+                //localizable settings per store (overrriden store settings) are not supported yet
+                true
+            ))
+        </div>
+    </div>
+</div>

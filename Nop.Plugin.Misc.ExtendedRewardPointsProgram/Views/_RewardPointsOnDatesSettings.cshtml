@@ -1,0 +1,122 @@
+﻿@model Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models.ExtendedRewardPointsProgramModel
+
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p>@T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Hint")</p>
+            <div id="rewardpointsondatessettings-grid"></div>
+
+            <script>
+                $(document).ready(function() {
+                    $("#rewardpointsondatessettings-grid").kendoGrid({
+                        dataSource: {
+                            type: "json",
+                            transport: {
+                                read: {
+                                    url: "@Html.Raw(Url.Action("RewardPointsOnDateList", "ExtendedRewardPointsProgram"))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                },
+                                destroy: {
+                                    url: "@Html.Raw(Url.Action("RewardPointsOnDateDelete", "ExtendedRewardPointsProgram"))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total",
+                                errors: "Errors",
+                                model: {
+                                    id: "Id",
+                                    fields: {
+                                        Store: { editable: false, type: "string" },
+                                        StoreId: { editable: false, type: "number" },
+                                        CustomerRole: { editable: false, type: "string" },
+                                        CustomerRoleId: { editable: false, type: "number" },
+                                        Points: { editable: false, type: "number" },
+                                        Message: { editable: false, type: "string" },
+                                        AwardingDateUtc: { editable: false, type: "date" },
+                                        Id: { editable: false, type: "number" }
+                                    }
+                                }
+                            },
+                            error: function(e) {
+                                display_kendoui_grid_error(e);
+                                // Cancel the changes
+                                this.cancelChanges();
+                            },
+                            serverPaging: true,
+                            serverFiltering: true,
+                            serverSorting: true
+                        },
+                        pageable: {
+                            refresh: true,
+                            numeric: false,
+                            previousNext: false,
+                            info: false
+                        },
+                        editable: {
+                            confirmation: "@T("Admin.Common.DeleteConfirmation")",
+                            mode: "inline"
+                        },
+                        scrollable: false,
+                        columns: [
+                            {
+                                field: "AwardingDateUtc",
+                                title: "@T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate")",
+                                type: "date",
+                                width: 200,
+                                format: "{0:G}"
+                            }, {
+                                field: "Message",
+                                title: "@T("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message")",
+                            }, {
+                                field: "Points",
+                                width: 150,
+                                title: "@T("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points")"
+                            }, {
+                                field: "StoreId",
+                                hidden: @(Model.IsMultistore ? "false" : "true"),
+                                title: "@T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store")",
+                                width: 150,
+                                template: "#:Store#"
+                            }, {
+                                field: "CustomerRoleId",
+                                title: "@T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole")",
+                                width: 150,
+                                template: "#:CustomerRole#"
+                            },  {
+                                field: "Id",
+                                title: "@T("Admin.Common.Edit")",
+                                width: 100,
+                                template: "<input type='submit' value='@T("Admin.Common.Edit")' onclick=\"javascript:OpenWindow('@Url.RouteUrl("Plugin.Misc.ExtendedRewardPointsProgram.RewardPointsOnDateCreateOrUpdate")?id=#=Id#&btnId=btnRefreshRewardPointsOnDateSettings', 800, 600, true); return false;\" class='btn btn-default' />"
+                            }, {
+                                command: { name: "destroy", text: "@T("Admin.Common.Delete")" },
+                                title: "@T("Admin.Common.Delete")",
+                                width: 100
+                            }
+                        ]
+                    });
+                });
+            </script>
+        </div>
+        <div class="panel-footer">
+            <input type="submit" id="btnAddNewRewardPointsOnDateSettings" class="btn btn-primary" value="@T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.AddNew")"
+                    onclick="javascript:OpenWindow('@(Url.RouteUrl("Plugin.Misc.ExtendedRewardPointsProgram.RewardPointsOnDateCreateOrUpdate") + "?id=0&btnId=btnRefreshRewardPointsOnDateSettings")', 800, 600, true); return false;"/>
+            <input type="submit" id="btnRefreshRewardPointsOnDateSettings" style="display: none" />
+
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#btnRefreshRewardPointsOnDateSettings').click(function() {
+                        $("#rewardpointsondatessettings-grid").data('kendoGrid').dataSource.read();
+                        //return false to don't reload a page
+                        return false;
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+﻿@{
+    Layout = "";
+}
+
+@using Nop.Web.Framework;
+@model Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models.ExtendedRewardPointsProgramModel
+
+@Html.Action("StoreScopeConfiguration", "Setting", new { area = "Admin" })
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <script>
+        $(document).ready(function() {
+            bindBootstrapTabSelectEvent('extended-reward-points-settings-configure');
+        });
+    </script>
+
+    <div id="extended-reward-points-settings-configure" class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            @Html.RenderBootstrapTabHeader("extended-reward-points-settings", @T("Plugins.Misc.ExtendedRewardPointsProgram"), true)
+            @Html.RenderBootstrapTabHeader("reward-points-on-dates-settings", @T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate"))
+        </ul>
+        <div class="tab-content">
+            @Html.RenderBootstrapTabContent("extended-reward-points-settings", @TabExtendedSettings(), true)
+            @Html.RenderBootstrapTabContent("reward-points-on-dates-settings", @TabOnDatesSettings())
+        </div>
+    </div>
+
+    @*save selected tab name*@
+    <input type="hidden" id="selected-tab-name" name="selected-tab-name" value="@(Html.GetSelectedTabName())">
+}
+
+@helper TabExtendedSettings()
+{
+    <div class="panel-group">
+        @*Reward points for the registration*@
+        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+            Model.ForRegistration, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForRegistration" } })
+
+        @*Reward points for product reviews*@
+        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+            Model.ForProductReviews, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForProductReviews" } })
+
+        @*Reward points for blog post comments*@
+        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+            Model.ForBlogComments, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForBlogComments" } })
+
+        @*Reward points for news comments*@
+        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+            Model.ForNewsComments, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForNewsComments" } })
+
+        @*Reward points for newsletter subscriptions*@
+        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+            Model.ForNewsletterSubscriptions, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForNewsletterSubscriptions" } })
+
+        @*Reward points for the first purchase*@
+        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+            Model.ForFirstPurchase, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForFirstPurchase" } })
+        
+        @*Reward points for the fast purchase*@
+        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+            Model.ForFastPurchase, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForFastPurchase" } })
+
+        <div class="form-group" style="margin-top: 10px">
+            <div class="col-md-9 col-md-offset-3">
+                <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+            </div>
+        </div>
+    </div>
+}
+
+@helper TabOnDatesSettings()
+{
+    @*Reward points on the specific dates*@
+    @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsOnDatesSettings.cshtml", Model)
+}
