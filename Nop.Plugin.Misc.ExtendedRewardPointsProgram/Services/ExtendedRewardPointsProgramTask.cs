@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Common;
 using Nop.Services.Customers;
@@ -22,6 +23,8 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
         private readonly IRewardPointsOnDateSettingsService _rewardPointsOnDateSettingsService;
         private readonly IRewardPointService _rewardPointService;
         private readonly IStoreService _storeService;
+        private readonly Core.Domain.Customers.RewardPointsSettings _rewardPointsSettings;
+        private readonly IStoreContext _storeContext;
 
         #endregion
 
@@ -31,13 +34,17 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
             IGenericAttributeService genericAttributeService,
             IRewardPointsOnDateSettingsService rewardPointsOnDateSettingsService,
             IRewardPointService rewardPointService,
-            IStoreService storeService)
+            IStoreService storeService,
+            Core.Domain.Customers.RewardPointsSettings rewardPointsSettings,
+            IStoreContext storeContext)
         {
             this._customerService = customerService;
             this._genericAttributeService = genericAttributeService;
             this._rewardPointsOnDateSettingsService = rewardPointsOnDateSettingsService;
             this._rewardPointService = rewardPointService;
             this._storeService = storeService;
+            this._rewardPointsSettings = rewardPointsSettings;
+            this._storeContext = storeContext;
         }
 
         #endregion
@@ -63,7 +70,10 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
                 var customers = _customerService.GetAllCustomers(customerRoleIds: customerRoles);
 
                 //get stores for which current awarding is actual
-                var storeIds = settings.StoreId > 0 ? new[] { settings.StoreId }.ToList() : _storeService.GetAllStores().Select(store => store.Id).ToList();
+                var storeIds = settings.StoreId > 0 || _rewardPointsSettings.PointsAccumulatedForAllStores
+                    ? new[] {settings.StoreId > 0 ? settings.StoreId : _storeContext.CurrentStore.Id}.ToList()
+                    : _storeService.GetAllStores().Select(store => store.Id).ToList();
+
                 foreach (var storeId in storeIds)
                 {
                     foreach (var customer in customers)
