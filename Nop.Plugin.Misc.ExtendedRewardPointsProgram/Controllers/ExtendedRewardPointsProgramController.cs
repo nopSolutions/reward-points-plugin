@@ -1,6 +1,7 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using Nop.Admin.Extensions;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Domain;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models;
@@ -8,15 +9,17 @@ using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services;
 using Nop.Services.Configuration;
 using localization = Nop.Services.Localization;
 using Nop.Services.Customers;
+using Nop.Services.Security;
 using Nop.Services.Stores;
+using Nop.Web.Areas.Admin.Extensions;
+using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Kendoui;
 using Nop.Web.Framework.Mvc;
-using Nop.Web.Framework.Security;
+using Nop.Web.Framework.Mvc.Filters;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
 {
-    [AdminAuthorize]
     public class ExtendedRewardPointsProgramController : BasePluginController
     {
         #region Fields
@@ -29,6 +32,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
         private readonly IStoreService _storeService;
         private readonly IWorkContext _workContext;
         private readonly IRewardPointsOnDateSettingsService _rewardPointsOnDateSettingsService;
+        private readonly IPermissionService _permissionService;
 
         #endregion
 
@@ -41,7 +45,8 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             ISettingService settingService,
             IStoreService storeService,
             IWorkContext workContext,
-            IRewardPointsOnDateSettingsService rewardPointsOnDateSettingsService)
+            IRewardPointsOnDateSettingsService rewardPointsOnDateSettingsService,
+            IPermissionService permissionService)
         {
             this._customerService = customerService;
             this._languageService = languageService;
@@ -51,6 +56,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             this._storeService = storeService;
             this._workContext = workContext;
             this._rewardPointsOnDateSettingsService = rewardPointsOnDateSettingsService;
+            this._permissionService = permissionService;
         }
 
         #endregion
@@ -113,13 +119,15 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
 
         #region Methods
 
-        [ChildActionOnly]
-        public ActionResult Configure()
+        [AuthorizeAdmin]
+        [Area(AreaNames.Admin)]
+        public IActionResult Configure()
         {
-            var model = new ExtendedRewardPointsProgramModel();
-
-            //check for multistore
-             model.IsMultistore = _storeService.GetAllStores().Count > 1;
+            var model = new ExtendedRewardPointsProgramModel
+            {
+                //check for multistore
+                IsMultistore = _storeService.GetAllStores().Count > 1
+            };
 
             var storeScope = GetActiveStoreScopeConfiguration(_storeService, _workContext);
 
@@ -159,9 +167,9 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
         }
 
         [HttpPost]
-        [ChildActionOnly]
-        [AdminAntiForgery]
-        public ActionResult Configure(ExtendedRewardPointsProgramModel model)
+        [AuthorizeAdmin]
+        [Area(AreaNames.Admin)]
+        public IActionResult Configure(ExtendedRewardPointsProgramModel model)
         {
             if (!ModelState.IsValid)
                 return Configure();
@@ -193,7 +201,9 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
 
         [HttpPost]
         [AdminAntiForgery]
-        public ActionResult RewardPointsOnDateList(DataSourceRequest command)
+        [AuthorizeAdmin]
+        [Area(AreaNames.Admin)]
+        public IActionResult RewardPointsOnDateList(DataSourceRequest command)
         {
             var allSettings = _rewardPointsOnDateSettingsService.GetAllRewardPointsOnDateSettings(pageIndex: command.Page - 1, pageSize: command.PageSize);
             var models = allSettings.Select(settings =>
@@ -227,9 +237,12 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
                 Total = models.Count
             });
         }
-
-        public ActionResult RewardPointsOnDateCreateOrUpdate(int id)
+        
+        public IActionResult RewardPointsOnDateCreateOrUpdate(int id)
         {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePlugins))
+                return AccessDeniedView();
+
             var model = new RewardPointsOnDateModel();
             var settings = _rewardPointsOnDateSettingsService.GetRewardPointsOnDateSettingsById(id);
 
@@ -239,10 +252,15 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
 
                 //localization
                 AddLocales(_languageService, model.Locales, (locale, languageId) =>
-                    locale.Message = localization.LocalizationExtensions.GetLocalized(settings, x => x.Message, languageId, false, false));
+                    locale.Message =
+                        localization.LocalizationExtensions.GetLocalized(settings, x => x.Message, languageId, false,
+                            false));
             }
             else
+            {
                 AddLocales(_languageService, model.Locales);
+                model.AwardingDateUtc = DateTime.UtcNow;
+            }
 
             //stores
             model.AvailableStores.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
@@ -258,9 +276,11 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
         }
 
         [HttpPost]
-        [AdminAntiForgery]
-        public ActionResult RewardPointsOnDateCreateOrUpdate(string btnId, RewardPointsOnDateModel model)
+        public IActionResult RewardPointsOnDateCreateOrUpdate(string btnId, RewardPointsOnDateModel model)
         {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePlugins))
+                return AccessDeniedView();
+
             var settings = _rewardPointsOnDateSettingsService.GetRewardPointsOnDateSettingsById(model.Id);
             if (settings != null)
             {
@@ -288,8 +308,9 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
         }
 
         [HttpPost]
-        [AdminAntiForgery]
-        public ActionResult RewardPointsOnDateDelete(int id)
+        [AuthorizeAdmin]
+        [Area(AreaNames.Admin)]
+        public IActionResult RewardPointsOnDateDelete(int id)
         {
             var settings = _rewardPointsOnDateSettingsService.GetRewardPointsOnDateSettingsById(id);
             if (settings != null)

@@ -1,77 +1,86 @@
 ﻿@{
-    Layout = "";
+    Layout = "_ConfigurePlugin";
 }
 
-@using Nop.Web.Framework;
+@using Nop.Web.Framework.Extensions
 @model Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models.ExtendedRewardPointsProgramModel
 
-@Html.Action("StoreScopeConfiguration", "Setting", new { area = "Admin" })
+@await Component.InvokeAsync("StoreScopeConfiguration")
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
+<form asp-controller="ExtendedRewardPointsProgram" asp-action="Configure" method="post">
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             bindBootstrapTabSelectEvent('extended-reward-points-settings-configure');
         });
     </script>
+    
+    <nop-tabs id="extended-reward-points-settings-configure">
+        <nop-tab asp-name="extended-reward-points-settings" asp-title="@T("Plugins.Misc.ExtendedRewardPointsProgram")" asp-default="true">
+            <div class="panel-group">
+                @{
+                    var dataDictForRegistration = new ViewDataDictionary(ViewData);
+                    dataDictForRegistration.TemplateInfo.HtmlFieldPrefix = "ForRegistration";
 
-    <div id="extended-reward-points-settings-configure" class="nav-tabs-custom">
-        <ul class="nav nav-tabs">
-            @Html.RenderBootstrapTabHeader("extended-reward-points-settings", @T("Plugins.Misc.ExtendedRewardPointsProgram"), true)
-            @Html.RenderBootstrapTabHeader("reward-points-on-dates-settings", @T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate"))
-        </ul>
-        <div class="tab-content">
-            @Html.RenderBootstrapTabContent("extended-reward-points-settings", @TabExtendedSettings(), true)
-            @Html.RenderBootstrapTabContent("reward-points-on-dates-settings", @TabOnDatesSettings())
-        </div>
-    </div>
+                    var dataDictForProductReviews = new ViewDataDictionary(ViewData);
+                    dataDictForProductReviews.TemplateInfo.HtmlFieldPrefix = "ForProductReviews";
+
+                    var dataDictForBlogComments = new ViewDataDictionary(ViewData);
+                    dataDictForBlogComments.TemplateInfo.HtmlFieldPrefix = "ForBlogComments";
+
+                    var dataDictForNewsComments = new ViewDataDictionary(ViewData);
+                    dataDictForNewsComments.TemplateInfo.HtmlFieldPrefix = "ForNewsComments";
+
+                    var dataDictForNewsletterSubscriptions = new ViewDataDictionary(ViewData);
+                    dataDictForNewsletterSubscriptions.TemplateInfo.HtmlFieldPrefix = "ForNewsletterSubscriptions";
+
+                    var dataDictForFirstPurchase = new ViewDataDictionary(ViewData);
+                    dataDictForFirstPurchase.TemplateInfo.HtmlFieldPrefix = "ForFirstPurchase";
+
+                    var dataDictForFastPurchase = new ViewDataDictionary(ViewData);
+                    dataDictForFastPurchase.TemplateInfo.HtmlFieldPrefix = "ForFastPurchase";
+                }
+
+                @*Reward points for the registration*@
+                @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+                    Model.ForRegistration, dataDictForRegistration)
+
+                @*Reward points for product reviews*@
+                @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+                    Model.ForProductReviews, dataDictForProductReviews)
+
+                @*Reward points for blog post comments*@
+                @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+                    Model.ForBlogComments, dataDictForBlogComments)
+
+                @*Reward points for news comments*@
+                @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+                    Model.ForNewsComments, dataDictForNewsComments)
+
+                @*Reward points for newsletter subscriptions*@
+                @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+                    Model.ForNewsletterSubscriptions, dataDictForNewsletterSubscriptions)
+
+                @*Reward points for the first purchase*@
+                @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+                    Model.ForFirstPurchase, dataDictForFirstPurchase)
+
+                @*Reward points for the fast purchase*@
+                @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
+                    Model.ForFastPurchase, dataDictForFastPurchase)
+
+                <div class="form-group" style="margin-top: 10px">
+                    <div class="col-md-9 col-md-offset-3">
+                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")"/>
+                    </div>
+                </div>
+            </div>
+        </nop-tab>
+        <nop-tab asp-name="reward-points-on-dates-settings" asp-title="@T("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate")">
+            @*Reward points on the specific dates*@
+            @await Html.PartialAsync("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsOnDatesSettings.cshtml", Model)
+        </nop-tab>
+    </nop-tabs>
 
     @*save selected tab name*@
     <input type="hidden" id="selected-tab-name" name="selected-tab-name" value="@(Html.GetSelectedTabName())">
-}
-
-@helper TabExtendedSettings()
-{
-    <div class="panel-group">
-        @*Reward points for the registration*@
-        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
-            Model.ForRegistration, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForRegistration" } })
-
-        @*Reward points for product reviews*@
-        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
-            Model.ForProductReviews, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForProductReviews" } })
-
-        @*Reward points for blog post comments*@
-        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
-            Model.ForBlogComments, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForBlogComments" } })
-
-        @*Reward points for news comments*@
-        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
-            Model.ForNewsComments, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForNewsComments" } })
-
-        @*Reward points for newsletter subscriptions*@
-        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
-            Model.ForNewsletterSubscriptions, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForNewsletterSubscriptions" } })
-
-        @*Reward points for the first purchase*@
-        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
-            Model.ForFirstPurchase, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForFirstPurchase" } })
-        
-        @*Reward points for the fast purchase*@
-        @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsFor.cshtml",
-            Model.ForFastPurchase, new ViewDataDictionary { TemplateInfo = new TemplateInfo { HtmlFieldPrefix = "ForFastPurchase" } })
-
-        <div class="form-group" style="margin-top: 10px">
-            <div class="col-md-9 col-md-offset-3">
-                <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
-            </div>
-        </div>
-    </div>
-}
-
-@helper TabOnDatesSettings()
-{
-    @*Reward points on the specific dates*@
-    @Html.Partial("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/_RewardPointsOnDatesSettings.cshtml", Model)
-}
+</form>

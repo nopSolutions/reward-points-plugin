@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
-using Nop.Web.Framework;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Localization;
-using Nop.Web.Framework.Mvc;
+using Nop.Web.Framework.Mvc.ModelBinding;
+using Nop.Web.Framework.Mvc.Models;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
 {
@@ -66,7 +66,6 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
         public bool ActivationDelay_OverrideForStore { get; set; }
         public int ActivationDelayPeriodId { get; set; }
 
-        [AllowHtml]
         [NopResourceDisplayName("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message")]
         public string Message { get; set; }
         public bool Message_OverrideForStore { get; set; }
@@ -78,7 +77,6 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
     {
         public int LanguageId { get; set; }
 
-        [AllowHtml]
         [NopResourceDisplayName("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message")]
         public string Message { get; set; }
     }
@@ -99,7 +97,6 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
         [UIHint("DateTime")]
         public DateTime AwardingDateUtc { get; set; }
 
-        [AllowHtml]
         [NopResourceDisplayName("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message")]
         public string Message { get; set; }
 

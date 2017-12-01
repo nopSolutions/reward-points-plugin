@@ -9,7 +9,7 @@ using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Domain;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services;
 using Nop.Services.Configuration;
-using Nop.Web.Framework.Mvc;
+using Nop.Web.Framework.Infrastructure;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure
 {

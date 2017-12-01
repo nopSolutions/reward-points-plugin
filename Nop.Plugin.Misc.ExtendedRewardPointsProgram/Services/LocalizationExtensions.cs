@@ -56,7 +56,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
             var key = settings.GetSettingKey(keySelector);
 
             //we do not support localized settings per store (overridden store settings)
-            var setting = settingService.GetSetting(key, storeId: 0, loadSharedValueIfNotFound: false);
+            var setting = settingService.GetSetting(key);
             if (setting == null)
                 return;
 

@@ -79,7 +79,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
         public virtual void InsertRewardPointsOnDateSettings(RewardPointsOnDateSettings settings)
         {
             if (settings == null)
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
 
             _repository.Insert(settings);
         }
@@ -91,7 +91,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
         public virtual void UpdateRewardPointsOnDateSettings(RewardPointsOnDateSettings settings)
         {
             if (settings == null)
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
 
             _repository.Update(settings);
         }
@@ -103,7 +103,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
         public virtual void DeleteRewardPointsOnDateSettings(RewardPointsOnDateSettings settings)
         {
             if (settings == null)
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
 
             _repository.Delete(settings);
         }

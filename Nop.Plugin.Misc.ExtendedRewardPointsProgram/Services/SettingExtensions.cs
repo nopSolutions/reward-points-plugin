@@ -22,17 +22,17 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
         {
             var member = keySelector.Body as MemberExpression;
             if (member == null)
-                throw new ArgumentException(string.Format("Expression '{0}' refers to a method, not a property.", keySelector));
+                throw new ArgumentException($"Expression '{keySelector}' refers to a method, not a property.");
 
             var propInfo = member.Member as PropertyInfo;
             if (propInfo == null)
-                throw new ArgumentException(string.Format("Expression '{0}' refers to a field, not a property.", keySelector));
+                throw new ArgumentException($"Expression '{keySelector}' refers to a field, not a property.");
 
             //for settings of plugin get runtime type; otherwise get compile type
             var compileType = typeof(T);
             var runtimeType = compileType != typeof(RewardPointsSettings) ? compileType : entity.GetType();
 
-            return string.Format("{0}.{1}", runtimeType.Name, propInfo.Name);
+            return $"{runtimeType.Name}.{propInfo.Name}";
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
     {
         #region Ctor
 
-        public ExtendedRewardPointsProgramSettingService(ICacheManager cacheManager,
+        public ExtendedRewardPointsProgramSettingService(IStaticCacheManager cacheManager,
             IEventPublisher eventPublisher,
             IRepository<Setting> settingRepository) : base(cacheManager, eventPublisher, settingRepository) 
         {
@@ -57,11 +57,11 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
         {
             var member = keySelector.Body as MemberExpression;
             if (member == null)
-                throw new ArgumentException(string.Format("Expression '{0}' refers to a method, not a property.", keySelector));
+                throw new ArgumentException($"Expression '{keySelector}' refers to a method, not a property.");
 
             var propInfo = member.Member as PropertyInfo;
             if (propInfo == null)
-                throw new ArgumentException(string.Format("Expression '{0}' refers to a field, not a property.", keySelector));
+                throw new ArgumentException($"Expression '{keySelector}' refers to a field, not a property.");
 
             var key = settings.GetSettingKey(keySelector);
 

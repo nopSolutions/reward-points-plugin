@@ -1,5 +1,6 @@
 using System.Linq;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Routing;
+using Nop.Core;
 using Nop.Core.Domain.Tasks;
 using Nop.Core.Plugins;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data;
@@ -23,7 +24,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
     {
         #region Constants
 
-        private const string ExtendedRewardPointsProgramTaskType = "Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services.ExtendedRewardPointsProgramTask, Nop.Plugin.Misc.ExtendedRewardPointsProgram";
+        private const string EXTENDED_REWARD_POINTS_PROGRAM_TASK_TYPE = "Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services.ExtendedRewardPointsProgramTask, Nop.Plugin.Misc.ExtendedRewardPointsProgram";
 
         #endregion
 
@@ -41,6 +42,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
         private readonly IScheduleTaskService _scheduleTaskService;
         private readonly ISettingService _settingService;
         private readonly ExtendedRewardPointsProgramObjectContext _objectContext;
+        private readonly IWebHelper _webHelper;
         
         #endregion
 
@@ -57,7 +59,8 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             IRewardPointsOnDateSettingsService rewardPointsOnDateSettingsService,
             IScheduleTaskService scheduleTaskService,
             ISettingService settingService,
-            ExtendedRewardPointsProgramObjectContext objectContext)
+            ExtendedRewardPointsProgramObjectContext objectContext,
+            IWebHelper webHelper)
         {
             this._blogService = blogService;
             this._customerService = customerService;
@@ -71,6 +74,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             this._scheduleTaskService = scheduleTaskService;
             this._settingService = settingService;
             this._objectContext = objectContext;
+            this._webHelper = webHelper;
         }
 
         #endregion
@@ -88,6 +92,11 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             actionName = "Configure";
             controllerName = "ExtendedRewardPointsProgram";
             routeValues = new RouteValueDictionary { { "Namespaces", "Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers" }, { "area", null } };
+        }
+
+        public override string GetConfigurationPageUrl()
+        {
+            return $"{_webHelper.GetStoreLocation()}Admin/ExtendedRewardPointsProgram/Configure";
         }
 
         /// <summary>
@@ -136,14 +145,14 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             });
 
             //task for awarding on specific dates
-            if (_scheduleTaskService.GetTaskByType(ExtendedRewardPointsProgramTaskType) == null)
+            if (_scheduleTaskService.GetTaskByType(EXTENDED_REWARD_POINTS_PROGRAM_TASK_TYPE) == null)
             {
                 _scheduleTaskService.InsertTask(new ScheduleTask
                 {
                     Enabled = true,
                     Name = "Extended reward points program task",
                     Seconds = 3600,
-                    Type = ExtendedRewardPointsProgramTaskType
+                    Type = EXTENDED_REWARD_POINTS_PROGRAM_TASK_TYPE
                 });
             }
 
@@ -244,7 +253,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             _settingService.DeleteSetting<RewardPointsForRegistrationSettings>();
 
             //scheduled task
-            var task = _scheduleTaskService.GetTaskByType(ExtendedRewardPointsProgramTaskType);
+            var task = _scheduleTaskService.GetTaskByType(EXTENDED_REWARD_POINTS_PROGRAM_TASK_TYPE);
             if (task != null)
                 _scheduleTaskService.DeleteTask(task);
 

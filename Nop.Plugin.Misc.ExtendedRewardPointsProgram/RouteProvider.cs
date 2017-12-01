@@ -1,6 +1,6 @@
-﻿using System.Web.Mvc;
-using System.Web.Routing;
-using Nop.Web.Framework.Mvc.Routes;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
+using Nop.Web.Framework.Mvc.Routing;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
 {
@@ -9,13 +9,11 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
     /// </summary>
     public class RouteProvider : IRouteProvider
     {
-        public void RegisterRoutes(RouteCollection routes)
+        public void RegisterRoutes(IRouteBuilder routeBuilder)
         {
-            routes.MapRoute("Plugin.Misc.ExtendedRewardPointsProgram.RewardPointsOnDateCreateOrUpdate",
-                 "Plugins/ExtendedRewardPointsProgram/RewardPointsOnDateCreateOrUpdate",
-                 new { controller = "ExtendedRewardPointsProgram", action = "RewardPointsOnDateCreateOrUpdate", },
-                 new[] { "Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers" }
-            );
+            routeBuilder.MapRoute("Plugin.Misc.ExtendedRewardPointsProgram.RewardPointsOnDateCreateOrUpdate",
+                "Plugins/ExtendedRewardPointsProgram/RewardPointsOnDateCreateOrUpdate",
+                new { controller = "ExtendedRewardPointsProgram", action = "RewardPointsOnDateCreateOrUpdate" });
         }
 
         public int Priority

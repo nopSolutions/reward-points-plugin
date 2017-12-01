@@ -14,7 +14,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
     /// <summary>
     /// Represents task for extended reward points program
     /// </summary>
-    public partial class ExtendedRewardPointsProgramTask : ITask
+    public partial class ExtendedRewardPointsProgramTask : IScheduleTask
     {
         #region Fields
 

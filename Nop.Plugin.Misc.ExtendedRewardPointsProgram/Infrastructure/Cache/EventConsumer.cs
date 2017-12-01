@@ -34,7 +34,6 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
 
         private readonly ICustomerService _customerService;
         private readonly IGenericAttributeService _genericAttributeService;
-        private readonly localization.ILocalizationService _localizationService;
         private readonly IOrderService _orderService;
         private readonly IRewardPointService _rewardPointService;
         private readonly IStoreContext _storeContext;
@@ -52,7 +51,6 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
 
         public EventConsumer(ICustomerService customerService,
             IGenericAttributeService genericAttributeService,
-            localization.ILocalizationService localizationService,
             IOrderService orderService,
             IRewardPointService rewardPointService,
             IStoreContext storeContext,
@@ -66,7 +64,6 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
         {
             this._customerService = customerService;
             this._genericAttributeService = genericAttributeService;
-            this._localizationService = localizationService;
             this._orderService = orderService;
             this._rewardPointService = rewardPointService;
             this._storeContext = storeContext;
