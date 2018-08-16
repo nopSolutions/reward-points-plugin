@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Nop.Core;
 using Nop.Data;
+using Nop.Data.Extensions;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Domain;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
@@ -15,9 +16,8 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
     {
         #region Ctor
 
-        public ExtendedRewardPointsProgramObjectContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        public ExtendedRewardPointsProgramObjectContext(DbContextOptions<ExtendedRewardPointsProgramObjectContext> options) : base(options)
         {
-            //((IObjectContextAdapter) this).ObjectContext.ContextOptions.LazyLoadingEnabled = true;
         }
 
         #endregion
@@ -29,8 +29,8 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
         /// </summary>
         public virtual bool ProxyCreationEnabled
         {
-            get { return this.Configuration.ProxyCreationEnabled; }
-            set { this.Configuration.ProxyCreationEnabled = value; }
+            get { return this.ProxyCreationEnabled; }
+            set { this.ProxyCreationEnabled = value; }
         }
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
         /// </summary>
         public virtual bool AutoDetectChangesEnabled
         {
-            get { return this.Configuration.AutoDetectChangesEnabled; }
-            set { this.Configuration.AutoDetectChangesEnabled = value; }
+            get { return this.AutoDetectChangesEnabled; }
+            set { this.AutoDetectChangesEnabled = value; }
         }
 
         #endregion
@@ -50,12 +50,9 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
         /// Add entity to the configuration of the model for a derived context before it is locked down
         /// </summary>
         /// <param name="modelBuilder">The builder that defines the model for the context being created</param>
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Configurations.Add(new RewardPointsOnDateSettingsMap());
-
-            //disable EdmMetadata generation
-            //modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
+            modelBuilder.ApplyConfiguration(new RewardPointsOnDateSettingsMap());
             base.OnModelCreating(modelBuilder);
         }
 
@@ -64,22 +61,22 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
         #region Methods
 
         /// <summary>
-        /// Generates a data definition language script that creates schema objects
+        /// Creates a DbSet that can be used to query and save instances of entity
         /// </summary>
-        /// <returns>A DDL script</returns>
-        public string CreateDatabaseScript()
+        /// <typeparam name="TEntity">Entity type</typeparam>
+        /// <returns>A set for the given entity type</returns>
+        public virtual new DbSet<TEntity> Set<TEntity>() where TEntity : BaseEntity
         {
-            return ((IObjectContextAdapter)this).ObjectContext.CreateDatabaseScript();
+            return base.Set<TEntity>();
         }
 
         /// <summary>
-        /// Returns a System.Data.Entity.DbSet`1 instance for access to entities of the given type in the context and the underlying store
+        /// Generate a script to create all tables for the current model
         /// </summary>
-        /// <typeparam name="TEntity">The type entity for which a set should be returned</typeparam>
-        /// <returns>A set for the given entity type</returns>
-        public new IDbSet<TEntity> Set<TEntity>() where TEntity : BaseEntity
+        /// <returns>A SQL script</returns>
+        public virtual string GenerateCreateScript()
         {
-            return base.Set<TEntity>();
+            return this.Database.GenerateCreateScript();
         }
 
         /// <summary>
@@ -88,8 +85,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
         public void Install()
         {
             //create the table
-            Database.ExecuteSqlCommand(CreateDatabaseScript());
-            SaveChanges();
+            this.ExecuteSqlScript(this.GenerateCreateScript());
         }
 
         /// <summary>
@@ -98,7 +94,30 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
         public void Uninstall()
         {
             //drop the table
-            this.DropPluginTable(this.GetTableName<RewardPointsOnDateSettings>());
+            this.DropPluginTable(nameof(RewardPointsOnDateSettings));
+        }
+
+        /// <summary>
+        /// Creates a LINQ query for the query type based on a raw SQL query
+        /// </summary>
+        /// <typeparam name="TQuery">Query type</typeparam>
+        /// <param name="sql">The raw SQL query</param>
+        /// <returns>An IQueryable representing the raw SQL query</returns>
+        public virtual IQueryable<TQuery> QueryFromSql<TQuery>(string sql) where TQuery : class
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Creates a LINQ query for the entity based on a raw SQL query
+        /// </summary>
+        /// <typeparam name="TEntity">Entity type</typeparam>
+        /// <param name="sql">The raw SQL query</param>
+        /// <param name="parameters">The values to be assigned to parameters</param>
+        /// <returns>An IQueryable representing the raw SQL query</returns>
+        public virtual IQueryable<TEntity> EntityFromSql<TEntity>(string sql, params object[] parameters) where TEntity : BaseEntity
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -139,15 +158,32 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data
         }
 
         /// <summary>
-        /// Detach an entity
+        /// Executes the given SQL against the database
         /// </summary>
-        /// <param name="entity">Entity</param>
-        public void Detach(object entity)
+        /// <param name="sql">The SQL to execute</param>
+        /// <param name="doNotEnsureTransaction">true - the transaction creation is not ensured; false - the transaction creation is ensured.</param>
+        /// <param name="timeout">The timeout to use for command. Note that the command timeout is distinct from the connection timeout, which is commonly set on the database connection string</param>
+        /// <param name="parameters">Parameters to use with the SQL</param>
+        /// <returns>The number of rows affected</returns>
+        public virtual int ExecuteSqlCommand(RawSqlString sql, bool doNotEnsureTransaction = false, int? timeout = null, params object[] parameters)
         {
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+            using (var transaction = this.Database.BeginTransaction())
+            {
+                var result = this.Database.ExecuteSqlCommand(sql, parameters);
+                transaction.Commit();
 
-            ((IObjectContextAdapter)this).ObjectContext.Detach(entity);
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Detach an entity from the context
+        /// </summary>
+        /// <typeparam name="TEntity">Entity type</typeparam>
+        /// <param name="entity">Entity</param>
+        public virtual void Detach<TEntity>(TEntity entity) where TEntity : BaseEntity
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

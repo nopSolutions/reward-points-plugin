@@ -1,9 +1,7 @@
-﻿@{
+﻿@model Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models.ExtendedRewardPointsProgramModel
+@{
     Layout = "_ConfigurePlugin";
 }
-
-@using Nop.Web.Framework.Extensions
-@model Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models.ExtendedRewardPointsProgramModel
 
 @await Component.InvokeAsync("StoreScopeConfiguration")
 
@@ -13,7 +11,7 @@
             bindBootstrapTabSelectEvent('extended-reward-points-settings-configure');
         });
     </script>
-    
+
     <nop-tabs id="extended-reward-points-settings-configure">
         <nop-tab asp-name="extended-reward-points-settings" asp-title="@T("Plugins.Misc.ExtendedRewardPointsProgram")" asp-default="true">
             <div class="panel-group">
@@ -70,7 +68,7 @@
 
                 <div class="form-group" style="margin-top: 10px">
                     <div class="col-md-9 col-md-offset-3">
-                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")"/>
+                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
                     </div>
                 </div>
             </div>

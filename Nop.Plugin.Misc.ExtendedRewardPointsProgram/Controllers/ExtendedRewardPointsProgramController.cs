@@ -7,11 +7,11 @@ using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Domain;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services;
 using Nop.Services.Configuration;
-using localization = Nop.Services.Localization;
 using Nop.Services.Customers;
+using Nop.Services.Localization;
 using Nop.Services.Security;
 using Nop.Services.Stores;
-using Nop.Web.Areas.Admin.Extensions;
+using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Kendoui;
@@ -25,12 +25,12 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
         #region Fields
 
         private readonly ICustomerService _customerService;
-        private readonly localization.ILanguageService _languageService;
-        private readonly localization.ILocalizationService _localizationService;
-        private readonly localization.ILocalizedEntityService _localizedEntityService;
+        private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedEntityService _localizedEntityService;
         private readonly ISettingService _settingService;
         private readonly IStoreService _storeService;
-        private readonly IWorkContext _workContext;
+        private readonly IStoreContext _storeContext;
         private readonly IRewardPointsOnDateSettingsService _rewardPointsOnDateSettingsService;
         private readonly IPermissionService _permissionService;
 
@@ -39,12 +39,12 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
         #region Ctor
 
         public ExtendedRewardPointsProgramController(ICustomerService customerService,
-            localization.ILanguageService languageService,
-            localization.ILocalizationService localizationService,
-            localization.ILocalizedEntityService localizedEntityService,
+            ILanguageService languageService,
+            ILocalizationService localizationService,
+            ILocalizedEntityService localizedEntityService,
             ISettingService settingService,
             IStoreService storeService,
-            IWorkContext workContext,
+            IStoreContext storeContext,
             IRewardPointsOnDateSettingsService rewardPointsOnDateSettingsService,
             IPermissionService permissionService)
         {
@@ -54,7 +54,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             this._localizedEntityService = localizedEntityService;
             this._settingService = settingService;
             this._storeService = storeService;
-            this._workContext = workContext;
+            this._storeContext = storeContext;
             this._rewardPointsOnDateSettingsService = rewardPointsOnDateSettingsService;
             this._permissionService = permissionService;
         }
@@ -64,10 +64,10 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
         #region Utilities
 
         [NonAction]
-        protected void PrepareModel(RewardPointsSettings settings, RewardPointsModel model, int storeScope, string title, string description)
+        protected RewardPointsModel PrepareModel(RewardPointsSettings settings, int storeScope, string title, string description)
         {
             //common settings
-            model = settings.MapTo(model);
+            var model = settings.ToSettingsModel<RewardPointsModel>();
 
             //some of specific settings
             model.ActiveStoreScopeConfiguration = storeScope;
@@ -76,7 +76,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             model.Description = description;
 
             //localization. no multi-store support for localization yet
-            AddLocales(_languageService, model.Locales, (locale, languageId) => 
+            AddLocales(_languageService, model.Locales, (locale, languageId) =>
                 locale.Message = settings.GetLocalizedSetting(x => x.Message, languageId, 0, false, false));
 
             //overridable per store settings
@@ -86,14 +86,17 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
                 model.Points_OverrideForStore = _settingService.SettingExists(settings, x => x.Points, storeScope);
                 model.ActivationDelay_OverrideForStore = _settingService.SettingExists(settings, x => x.ActivationDelay, storeScope);
                 model.Message_OverrideForStore = _settingService.SettingExists(settings, x => x.Message, storeScope);
+                model.Minutes_OverrideForStore = _settingService.SettingExists(settings, x => x.Minutes, storeScope);
             }
+
+            return model;
         }
 
         [NonAction]
         protected void SaveSettings(RewardPointsSettings settings, RewardPointsModel model, int storeScope)
         {
             //common settings
-            settings = model.MapTo(settings);
+            settings = model.ToSettings(settings);
 
             //some of specific settings
             if (model.ActivatePointsImmediately)
@@ -107,7 +110,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             _settingService.SaveSettingOverridablePerStore(settings, x => x.ActivationDelay, model.ActivationDelay_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(settings, x => x.ActivationDelayPeriodId, model.ActivationDelay_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(settings, x => x.Message, model.Message_OverrideForStore, storeScope, false);
-
+            
             //localization. no multi-store support for localization yet
             foreach (var localized in model.Locales)
             {
@@ -129,39 +132,40 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
                 IsMultistore = _storeService.GetAllStores().Count > 1
             };
 
-            var storeScope = GetActiveStoreScopeConfiguration(_storeService, _workContext);
+            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
 
             //prepare models
-            PrepareModel(_settingService.LoadSetting<RewardPointsForBlogCommentsSettings>(storeScope), model.ForBlogComments, storeScope,
+            model.ForBlogComments = PrepareModel(_settingService.LoadSetting<RewardPointsForBlogCommentsSettings>(storeScope), storeScope,
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments"),
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments.Hint"));
 
-            PrepareModel(_settingService.LoadSetting<RewardPointsForFirstPurchaseSettings>(storeScope), model.ForFirstPurchase, storeScope,
+            model.ForFirstPurchase = PrepareModel(_settingService.LoadSetting<RewardPointsForFirstPurchaseSettings>(storeScope), storeScope,
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase"),
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase.Hint"));
 
-            PrepareModel(_settingService.LoadSetting<RewardPointsForNewsCommentsSettings>(storeScope), model.ForNewsComments, storeScope,
+            model.ForNewsComments = PrepareModel(_settingService.LoadSetting<RewardPointsForNewsCommentsSettings>(storeScope), storeScope,
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments"),
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments.Hint"));
 
-            PrepareModel(_settingService.LoadSetting<RewardPointsForNewsletterSubscriptionsSettings>(storeScope), model.ForNewsletterSubscriptions, storeScope,
+            model.ForNewsletterSubscriptions = PrepareModel(_settingService.LoadSetting<RewardPointsForNewsletterSubscriptionsSettings>(storeScope), storeScope,
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions"),
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions.Hint"));
 
-            PrepareModel(_settingService.LoadSetting<RewardPointsForProductReviewsSettings>(storeScope), model.ForProductReviews, storeScope,
+            model.ForProductReviews = PrepareModel(_settingService.LoadSetting<RewardPointsForProductReviewsSettings>(storeScope), storeScope,
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews"),
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews.Hint"));
 
-            PrepareModel(_settingService.LoadSetting<RewardPointsForRegistrationSettings>(storeScope), model.ForRegistration, storeScope,
+            model.ForRegistration = PrepareModel(_settingService.LoadSetting<RewardPointsForRegistrationSettings>(storeScope), storeScope,
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration"),
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration.Hint"));
 
-            var rewardPointsForFastPurchaseSettings = _settingService.LoadSetting<RewardPointsForFastPurchaseSettings>(storeScope);
-            PrepareModel(rewardPointsForFastPurchaseSettings, model.ForFastPurchase, storeScope,
+            var settings = _settingService.LoadSetting<RewardPointsForFastPurchaseSettings>(storeScope);
+            model.ForFastPurchase = PrepareModel(settings, storeScope,
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase"),
                 _localizationService.GetResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Hint"));
-            model.ForFastPurchase.Minutes = rewardPointsForFastPurchaseSettings.Minutes;
-            model.ForFastPurchase.Minutes_OverrideForStore = storeScope > 0 && _settingService.SettingExists(rewardPointsForFastPurchaseSettings, x => x.Minutes, storeScope);
+
+            model.ForFastPurchase.Minutes = settings.Minutes;
+            model.ForFastPurchase.Minutes_OverrideForStore = storeScope > 0 && _settingService.SettingExists(settings, x => x.Minutes, storeScope);
 
             return View("~/Plugins/Misc.ExtendedRewardPointsProgram/Views/Configure.cshtml", model);
         }
@@ -174,7 +178,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             if (!ModelState.IsValid)
                 return Configure();
 
-            var storeScope = GetActiveStoreScopeConfiguration(_storeService, _workContext);
+            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
 
             //save settings
             SaveSettings(_settingService.LoadSetting<RewardPointsForBlogCommentsSettings>(storeScope), model.ForBlogComments, storeScope);
@@ -209,7 +213,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             var models = allSettings.Select(settings =>
             {
                 //prepare common settings
-                var model = settings.MapTo(new RewardPointsOnDateModel());
+                var model = settings.ToSettingsModel<RewardPointsOnDateModel>();
 
                 //some of specific settings
                 if (model.StoreId > 0)
@@ -248,13 +252,13 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
 
             if (settings != null)
             {
-                model = settings.MapTo(model);
+                model = settings.ToSettingsModel<RewardPointsOnDateModel>();
 
                 //localization
                 AddLocales(_languageService, model.Locales, (locale, languageId) =>
-                    locale.Message =
-                        localization.LocalizationExtensions.GetLocalized(settings, x => x.Message, languageId, false,
-                            false));
+                {
+                    locale.Message = _localizationService.GetLocalized(settings, x => x.Message, languageId, false, false);
+                });
             }
             else
             {
@@ -285,13 +289,14 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Controllers
             if (settings != null)
             {
                 //update existing settings
-                settings = model.MapTo(settings);
+                settings = model.ToSettings(settings);
                 _rewardPointsOnDateSettingsService.UpdateRewardPointsOnDateSettings(settings);
             }
             else
             {
                 //create new settings
-                settings = model.MapTo(new RewardPointsOnDateSettings());
+                //settings = model.MapTo(new RewardPointsOnDateSettings());
+                settings = model.ToSettings(new RewardPointsOnDateSettings());
                 _rewardPointsOnDateSettingsService.InsertRewardPointsOnDateSettings(settings);
             }
 

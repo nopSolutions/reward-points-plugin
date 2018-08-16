@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Nop.Web.Framework.Localization;
 using Nop.Web.Framework.Mvc.ModelBinding;
-using Nop.Web.Framework.Mvc.Models;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
 {
@@ -18,7 +17,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
             ForNewsletterSubscriptions = new RewardPointsModel();
             ForProductReviews = new RewardPointsModel();
             ForRegistration = new RewardPointsModel();
-            ForFastPurchase = new RewardPointsForFastPurchaseModel();
+            ForFastPurchase = new RewardPointsModel();
         }
 
         public bool IsMultistore { get; set; }
@@ -35,10 +34,10 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
 
         public RewardPointsModel ForRegistration { get; set; }
 
-        public RewardPointsForFastPurchaseModel ForFastPurchase { get; set; }
+        public RewardPointsModel ForFastPurchase { get; set; }
     }
 
-    public class RewardPointsModel : BaseNopModel, ILocalizedModel<LocalizedModel>
+    public class RewardPointsModel : BaseNopModel, ILocalizedModel<LocalizedModel>, ISettingsModel
     {
         public RewardPointsModel()
         {
@@ -70,10 +69,14 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
         public string Message { get; set; }
         public bool Message_OverrideForStore { get; set; }
 
+        [NopResourceDisplayName("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes")]
+        public int? Minutes { get; set; }
+        public bool Minutes_OverrideForStore { get; set; }
+
         public IList<LocalizedModel> Locales { get; set; }
     }
 
-    public class LocalizedModel : ILocalizedModelLocal
+    public class LocalizedModel : ILocalizedLocaleModel
     {
         public int LanguageId { get; set; }
 
@@ -81,8 +84,10 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
         public string Message { get; set; }
     }
 
-    public class RewardPointsOnDateModel : BaseNopEntityModel, ILocalizedModel<LocalizedModel>
+    public class RewardPointsOnDateModel : BaseNopEntityModel, ILocalizedModel<LocalizedModel>, ISettingsModel
     {
+        public int ActiveStoreScopeConfiguration { get; set; }
+
         public RewardPointsOnDateModel()
         {
             AvailableStores = new List<SelectListItem>();
@@ -111,12 +116,5 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Models
         public string Store { get; set; }
 
         public IList<LocalizedModel> Locales { get; set; }
-    }
-
-    public class RewardPointsForFastPurchaseModel : RewardPointsModel
-    {
-        [NopResourceDisplayName("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes")]
-        public int Minutes { get; set; }
-        public bool Minutes_OverrideForStore { get; set; }
     }
 }

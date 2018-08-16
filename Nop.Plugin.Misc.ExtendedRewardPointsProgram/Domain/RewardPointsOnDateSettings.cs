@@ -1,5 +1,6 @@
 using System;
 using Nop.Core;
+using Nop.Core.Configuration;
 using Nop.Core.Domain.Localization;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Domain
@@ -7,7 +8,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Domain
     /// <summary>
     /// Represents a settings for reward points on specific date
     /// </summary>
-    public class RewardPointsOnDateSettings : BaseEntity, ILocalizedEntity
+    public class RewardPointsOnDateSettings : BaseEntity, ILocalizedEntity, ISettings
     {
         /// <summary>
         /// Gets or sets a number of awarded points

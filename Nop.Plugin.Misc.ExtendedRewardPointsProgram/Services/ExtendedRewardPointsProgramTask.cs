@@ -23,6 +23,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
         private readonly IRewardPointsOnDateSettingsService _rewardPointsOnDateSettingsService;
         private readonly IRewardPointService _rewardPointService;
         private readonly IStoreService _storeService;
+        private readonly ILocalizationService _localizationService;
         private readonly Core.Domain.Customers.RewardPointsSettings _rewardPointsSettings;
         private readonly IStoreContext _storeContext;
 
@@ -35,6 +36,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
             IRewardPointsOnDateSettingsService rewardPointsOnDateSettingsService,
             IRewardPointService rewardPointService,
             IStoreService storeService,
+            ILocalizationService localizationService,
             Core.Domain.Customers.RewardPointsSettings rewardPointsSettings,
             IStoreContext storeContext)
         {
@@ -43,6 +45,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
             this._rewardPointsOnDateSettingsService = rewardPointsOnDateSettingsService;
             this._rewardPointService = rewardPointService;
             this._storeService = storeService;
+            this._localizationService = localizationService;
             this._rewardPointsSettings = rewardPointsSettings;
             this._storeContext = storeContext;
         }
@@ -60,7 +63,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
             var allPastAwardedPointsSettings = _rewardPointsOnDateSettingsService.GetAllRewardPointsOnDateSettings(date: DateTime.UtcNow);
 
             //get not yet awarded
-            var notAwarded = allPastAwardedPointsSettings.Where(settings => !settings.GetAttribute<bool>("CustomersAwardedOnDate")).ToList();
+            var notAwarded = allPastAwardedPointsSettings.Where(settings => !_genericAttributeService.GetAttribute<bool>(settings, "CustomersAwardedOnDate")).ToList();
 
             //and now award it
             foreach (var settings in notAwarded)
@@ -79,8 +82,8 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
                     foreach (var customer in customers)
                     {
                         //get localized message for appropriate customer
-                        var languageId = customer.GetAttribute<int>(SystemCustomerAttributeNames.LanguageId, storeId);
-                        var message = settings.GetLocalized(setting => setting.Message, languageId);
+                        var languageId = _genericAttributeService.GetAttribute<int>(customer, NopCustomerDefaults.LanguageIdAttribute, storeId);
+                        var message = _localizationService.GetLocalized(settings, setting => setting.Message, languageId);
 
                         //add reward points on specific date
                         _rewardPointService.AddRewardPointsHistoryEntry(customer, settings.Points, storeId, message);

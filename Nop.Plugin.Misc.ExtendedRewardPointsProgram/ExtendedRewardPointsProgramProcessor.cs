@@ -35,6 +35,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILanguageService _languageService;
         private readonly ILocalizedEntityService _localizedEntityService;
+        private readonly ILocalizationService _localizationService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
         private readonly INewsService _newsService;
         private readonly IProductService _productService;
@@ -53,6 +54,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             IGenericAttributeService genericAttributeService,
             ILanguageService languageService,
             ILocalizedEntityService localizedEntityService,
+            ILocalizationService localizationService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
             INewsService newsService,
             IProductService productService,
@@ -67,6 +69,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             this._genericAttributeService = genericAttributeService;
             this._languageService = languageService;
             this._localizedEntityService = localizedEntityService;
+            this._localizationService = localizationService;
             this._newsLetterSubscriptionService = newsLetterSubscriptionService;
             this._newsService = newsService;
             this._productService = productService;
@@ -157,43 +160,43 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
             }
 
             //locales
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram", "Extended reward points settings");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately", "Activate points immediately");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately.Hint", "Activates bonus points immediately after their calculation");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay", "Reward points activation");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay.Hint", "Specify how many days (hours) must elapse before earned points become active.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled", "Enabled");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled.Hint", "Check to enable reward points program.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message", "Message");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message.Hint", "Enter the message for reward points history.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points", "Points");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points.Hint", "Specify number of awarded points");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments", "Reward points for blog post comments");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments.Hint", "Points are awarded after a customer left a comment to a certain blog post and it has been approved by store owner.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase", "Reward points for the fast purchase");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes", "Minutes");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes.Hint", "Specify the time interval in minutes during which the user must complete a purchase.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Hint", "Points are awarded after an order get paid in a certain period after a customer add product to cart.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase", "Reward points for the first purchase");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase.Hint", "Points are awarded after a customer made a first purchase in online store.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments", "Reward points for news comments");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments.Hint", "Points are awarded after a customer left a comment to a certain news item and it has been approved by store owner.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions", "Reward points for newsletter subscriptions");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions.Hint", "Points are awarded after a customer subscribed to a newsletter.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews", "Reward points for product reviews");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews.Hint", "Points are awarded after a customer left a review to a product and it has been approved by store owner.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration", "Reward points for the registration");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration.Hint", "Points are awarded after a customer passed a registration.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate", "Reward points on specific date");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.AddNew", "Add new reward points on specific date settings");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Edit", "Edit reward points on specific date settings");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate", "Date of awarding");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate.Hint", "Specify date and time of awarding in UTC");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole", "Customer role");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole.Hint", "Select customer role for which the settings will be available.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store", "Store");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store.Hint", "Option to limit this settings to a certain store.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Hint", "It’s possible to award points on specific dates, for examples holidays. Customers will receive a message notification about that. That functionality can be limited by customer roles and stores.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram", "Extended reward points settings");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately", "Activate points immediately");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately.Hint", "Activates bonus points immediately after their calculation");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay", "Reward points activation");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay.Hint", "Specify how many days (hours) must elapse before earned points become active.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled", "Enabled");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled.Hint", "Check to enable reward points program.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message", "Message");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message.Hint", "Enter the message for reward points history.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points", "Points");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points.Hint", "Specify number of awarded points");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments", "Reward points for blog post comments");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments.Hint", "Points are awarded after a customer left a comment to a certain blog post and it has been approved by store owner.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase", "Reward points for the fast purchase");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes", "Minutes");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes.Hint", "Specify the time interval in minutes during which the user must complete a purchase.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Hint", "Points are awarded after an order get paid in a certain period after a customer add product to cart.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase", "Reward points for the first purchase");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase.Hint", "Points are awarded after a customer made a first purchase in online store.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments", "Reward points for news comments");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments.Hint", "Points are awarded after a customer left a comment to a certain news item and it has been approved by store owner.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions", "Reward points for newsletter subscriptions");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions.Hint", "Points are awarded after a customer subscribed to a newsletter.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews", "Reward points for product reviews");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews.Hint", "Points are awarded after a customer left a review to a product and it has been approved by store owner.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration", "Reward points for the registration");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration.Hint", "Points are awarded after a customer passed a registration.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate", "Reward points on specific date");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.AddNew", "Add new reward points on specific date settings");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Edit", "Edit reward points on specific date settings");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate", "Date of awarding");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate.Hint", "Specify date and time of awarding in UTC");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole", "Customer role");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole.Hint", "Select customer role for which the settings will be available.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store", "Store");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store.Hint", "Option to limit this settings to a certain store.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Hint", "It’s possible to award points on specific dates, for examples holidays. Customers will receive a message notification about that. That functionality can be limited by customer roles and stores.");
 
             base.Install();
         }
@@ -258,43 +261,43 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
                 _scheduleTaskService.DeleteTask(task);
 
             //locales
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.AddNew");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Edit");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store.Hint");
-            this.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivatePointsImmediately.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.ActivationDelay.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.IsEnabled.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Message.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.Fields.Points.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForBlogComments.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFirstPurchase.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Fields.Minutes.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForFastPurchase.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsComments.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForNewsletterSubscriptions.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForProductReviews.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.ForRegistration.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.AddNew");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Edit");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.AwardingDate.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.CustomerRole.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Fields.Store.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Misc.ExtendedRewardPointsProgram.RewardPointsOnDate.Hint");
 
             base.Uninstall();
         }

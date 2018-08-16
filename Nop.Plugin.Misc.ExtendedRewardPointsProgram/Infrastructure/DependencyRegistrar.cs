@@ -9,7 +9,7 @@ using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Data;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Domain;
 using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services;
 using Nop.Services.Configuration;
-using Nop.Web.Framework.Infrastructure;
+using Nop.Web.Framework.Infrastructure.Extensions;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure
 {
@@ -33,7 +33,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure
             builder.RegisterType<RewardPointsOnDateSettingsService>().As<IRewardPointsOnDateSettingsService>().InstancePerLifetimeScope();
 
             //data context
-            this.RegisterPluginDataContext<ExtendedRewardPointsProgramObjectContext>(builder, "nop_object_context_extended_reward_points_program");
+            builder.RegisterPluginDataContext<ExtendedRewardPointsProgramObjectContext>("nop_object_context_extended_reward_points_program");
 
             //override required repository with custom context
             builder.RegisterType<EfRepository<RewardPointsOnDateSettings>>().As<IRepository<RewardPointsOnDateSettings>>()

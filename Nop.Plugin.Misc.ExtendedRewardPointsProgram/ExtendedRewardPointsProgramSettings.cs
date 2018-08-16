@@ -31,6 +31,11 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
         /// Gets or sets a message for reward points history
         /// </summary>
         public string Message { get; set; }
+
+        /// <summary>
+        /// Gets or sets the time span in minutes during which the user must complete a purchase
+        /// </summary>
+        public int? Minutes { get; set; }
     }
 
     /// <summary>
@@ -66,11 +71,5 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram
     /// <summary>
     /// Represents reward point settings for the fast purchase
     /// </summary>
-    public class RewardPointsForFastPurchaseSettings : RewardPointsSettings
-    {
-        /// <summary>
-        /// Gets or sets the time span in minutes during which the user must complete a purchase
-        /// </summary>
-        public int Minutes { get; set; }
-    }
+    public class RewardPointsForFastPurchaseSettings : RewardPointsSettings { }
 }

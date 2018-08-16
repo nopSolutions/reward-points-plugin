@@ -13,7 +13,7 @@ using Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Events;
-using localization = Nop.Services.Localization;
+using Nop.Services.Localization;
 using Nop.Services.Orders;
 
 namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
@@ -28,7 +28,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
         IConsumer<CustomerRegisteredEvent>,
         IConsumer<EmailSubscribedEvent>,
         IConsumer<OrderPaidEvent>,
-        IConsumer<EntityInserted<ShoppingCartItem>>
+        IConsumer<EntityInsertedEvent<ShoppingCartItem>>
     {
         #region Fields
 
@@ -37,6 +37,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
         private readonly IOrderService _orderService;
         private readonly IRewardPointService _rewardPointService;
         private readonly IStoreContext _storeContext;
+        private readonly ILocalizationService _localizationService;
         private readonly RewardPointsForBlogCommentsSettings _rewardPointsSettingsForBlogComments;
         private readonly RewardPointsForFastPurchaseSettings _rewardPointsSettingsForFastPurchase;
         private readonly RewardPointsForFirstPurchaseSettings _rewardPointsSettingsForFirstPurchase;
@@ -54,6 +55,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
             IOrderService orderService,
             IRewardPointService rewardPointService,
             IStoreContext storeContext,
+            ILocalizationService localizationService,
             RewardPointsForBlogCommentsSettings rewardPointsSettingsForBlogComments,
             RewardPointsForFastPurchaseSettings rewardPointsForFastPurchaseSettings,
             RewardPointsForFirstPurchaseSettings rewardPointsSettingsForFirstPurchase,
@@ -67,6 +69,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
             this._orderService = orderService;
             this._rewardPointService = rewardPointService;
             this._storeContext = storeContext;
+            this._localizationService = localizationService;
             this._rewardPointsSettingsForBlogComments = rewardPointsSettingsForBlogComments;
             this._rewardPointsSettingsForFastPurchase = rewardPointsForFastPurchaseSettings;
             this._rewardPointsSettingsForFirstPurchase = rewardPointsSettingsForFirstPurchase;
@@ -94,7 +97,6 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
             var delayInHours = delayPeriod.ToHours(settings.ActivationDelay);
 
             return DateTime.UtcNow.AddHours(delayInHours);
-                
         }
 
         #endregion
@@ -112,14 +114,14 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
                 return;
 
             //reward user only for the first approving
-            if (blogCommentEvent.BlogComment.GetAttribute<bool>("CustomerAwardedForBlogComment", blogCommentEvent.BlogComment.StoreId))
+            if (_genericAttributeService.GetAttribute<bool>(blogCommentEvent.BlogComment, "CustomerAwardedForBlogComment", blogCommentEvent.BlogComment.StoreId))
                 return;
 
             //check whether delay is set
             var activationDate = GetRewardPointsActivationDate(_rewardPointsSettingsForBlogComments);
 
             //get message for the current customer
-            var languageId = blogCommentEvent.BlogComment.Customer.GetAttribute<int>(SystemCustomerAttributeNames.LanguageId, blogCommentEvent.BlogComment.StoreId);
+            var languageId = _genericAttributeService.GetAttribute<int>(blogCommentEvent.BlogComment.Customer, NopCustomerDefaults.LanguageIdAttribute, blogCommentEvent.BlogComment.StoreId);
             var message = _rewardPointsSettingsForBlogComments.GetLocalizedSetting(settings => settings.Message, languageId, blogCommentEvent.BlogComment.StoreId);
 
             //add reward points for approved blog post comment
@@ -143,14 +145,14 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
                 return;
 
             //reward user only for the first approving
-            if (newsCommentEvent.NewsComment.GetAttribute<bool>("CustomerAwardedForNewsComment", newsCommentEvent.NewsComment.StoreId))
+            if (_genericAttributeService.GetAttribute<bool>(newsCommentEvent.NewsComment, "CustomerAwardedForNewsComment", newsCommentEvent.NewsComment.StoreId))
                 return;
 
             //check whether delay is set
             var activationDate = GetRewardPointsActivationDate(_rewardPointsSettingsForNewsComments);
 
             //get message for the current customer
-            var languageId = newsCommentEvent.NewsComment.Customer.GetAttribute<int>(SystemCustomerAttributeNames.LanguageId, newsCommentEvent.NewsComment.StoreId);
+            var languageId = _genericAttributeService.GetAttribute<int>(newsCommentEvent.NewsComment.Customer, NopCustomerDefaults.LanguageIdAttribute, newsCommentEvent.NewsComment.StoreId);
             var message = _rewardPointsSettingsForNewsComments.GetLocalizedSetting(settings => settings.Message, languageId, newsCommentEvent.NewsComment.StoreId);
 
             //add reward points for approved news comment
@@ -174,16 +176,16 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
                 return;
 
             //reward user only for the first approving
-            if (productReviewEvent.ProductReview.GetAttribute<bool>("CustomerAwardedForProductReview", productReviewEvent.ProductReview.StoreId))
+            if (_genericAttributeService.GetAttribute<bool>(productReviewEvent.ProductReview, "CustomerAwardedForProductReview", productReviewEvent.ProductReview.StoreId))
                 return;
 
             //check whether delay is set
             var activationDate = GetRewardPointsActivationDate(_rewardPointsSettingsForProductReviews);
 
             //get message for the current customer
-            var languageId = productReviewEvent.ProductReview.Customer.GetAttribute<int>(SystemCustomerAttributeNames.LanguageId, productReviewEvent.ProductReview.StoreId);
+            var languageId = _genericAttributeService.GetAttribute<int>(productReviewEvent.ProductReview.Customer, NopCustomerDefaults.LanguageIdAttribute, productReviewEvent.ProductReview.StoreId);
             var message = _rewardPointsSettingsForProductReviews.GetLocalizedSetting(settings => settings.Message, languageId, productReviewEvent.ProductReview.StoreId);
-            var productName = localization.LocalizationExtensions.GetLocalized(productReviewEvent.ProductReview.Product, product => product.Name, languageId);
+            var productName = _localizationService.GetLocalized(productReviewEvent.ProductReview.Product, product => product.Name, languageId);
 
             //add reward points for approved product review
             _rewardPointService.AddRewardPointsHistoryEntry(productReviewEvent.ProductReview.Customer, _rewardPointsSettingsForProductReviews.Points,
@@ -209,7 +211,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
             var activationDate = GetRewardPointsActivationDate(_rewardPointsForRegistrationSettings);
 
             //get message for the current customer
-            var languageId = registeredEvent.Customer.GetAttribute<int>(SystemCustomerAttributeNames.LanguageId, _storeContext.CurrentStore.Id);
+            var languageId = _genericAttributeService.GetAttribute<int>(registeredEvent.Customer, NopCustomerDefaults.LanguageIdAttribute, _storeContext.CurrentStore.Id);
             var message = _rewardPointsForRegistrationSettings.GetLocalizedSetting(settings => settings.Message, languageId, _storeContext.CurrentStore.Id);
 
             //add reward points for approved product review
@@ -232,14 +234,14 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
                 return;
 
             //reward user only for the first subscription
-            if (subscribedEvent.Subscription.GetAttribute<bool>("CustomerAwardedForSubscription", subscribedEvent.Subscription.StoreId))
+            if (_genericAttributeService.GetAttribute<bool>(subscribedEvent.Subscription, "CustomerAwardedForSubscription", subscribedEvent.Subscription.StoreId))
                 return;
 
             //check whether delay is set
             var activationDate = GetRewardPointsActivationDate(_rewardPointsSettingsForNewsletterSubscriptions);
 
             //get message for the current customer
-            var languageId = customer.GetAttribute<int>(SystemCustomerAttributeNames.LanguageId, subscribedEvent.Subscription.StoreId);
+            var languageId = _genericAttributeService.GetAttribute<int>(customer, NopCustomerDefaults.LanguageIdAttribute, subscribedEvent.Subscription.StoreId);
             var message = _rewardPointsSettingsForNewsletterSubscriptions.GetLocalizedSetting(settings => settings.Message, languageId, subscribedEvent.Subscription.StoreId);
 
             //add reward points for newsletter subscription
@@ -253,7 +255,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
 
         #region Fast purchase
 
-        public void HandleEvent(EntityInserted<ShoppingCartItem> insertedShoppingCartItem)
+        public void HandleEvent(EntityInsertedEvent<ShoppingCartItem> insertedShoppingCartItem)
         {
             if (!_rewardPointsSettingsForFastPurchase.IsEnabled)
                 return;
@@ -301,7 +303,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
             if (_rewardPointsSettingsForFastPurchase.IsEnabled)
             {
                 //get start time of purchase
-                var purchaseStartTime = orderPaidEvent.Order.Customer.GetAttribute<DateTime?>("PurchaseStartTime", orderPaidEvent.Order.StoreId);
+                var purchaseStartTime = _genericAttributeService.GetAttribute<DateTime?>(orderPaidEvent.Order.Customer, "PurchaseStartTime", orderPaidEvent.Order.StoreId);
                 if (!purchaseStartTime.HasValue)
                     return;
 
@@ -309,7 +311,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Cache
                 _genericAttributeService.SaveAttribute<DateTime?>(orderPaidEvent.Order.Customer, "PurchaseStartTime", null, orderPaidEvent.Order.StoreId);
 
                 //compare the time of purchase with the set time span
-                if (DateTime.UtcNow.Subtract(purchaseStartTime.Value) > TimeSpan.FromMinutes(_rewardPointsSettingsForFastPurchase.Minutes))
+                if (DateTime.UtcNow.Subtract(purchaseStartTime.Value) > TimeSpan.FromMinutes(_rewardPointsSettingsForFastPurchase.Minutes ?? 0))
                     return;
 
                 //check whether delay is set

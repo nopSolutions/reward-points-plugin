@@ -27,6 +27,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
             bool returnDefaultValue = true, bool ensureTwoPublishedLanguages = true) where T : ISettings, new()
         {
             var settingService = EngineContext.Current.Resolve<ISettingService>();
+            var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
             var key = settings.GetSettingKey(keySelector);
 
@@ -35,7 +36,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
             if (setting == null)
                 return null;
 
-            return setting.GetLocalized(x => x.Value, languageId, returnDefaultValue, ensureTwoPublishedLanguages);
+            return localizationService.GetLocalized(setting, x => x.Value, languageId, returnDefaultValue, ensureTwoPublishedLanguages);
         }
 
         /// <summary>

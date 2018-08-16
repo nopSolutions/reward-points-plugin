@@ -8,7 +8,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Infrastructure.Mapper
     /// <summary>
     /// Represents AutoMapper configuration for extended reward points program models
     /// </summary>
-    public class AutoMapperConfiguration : Profile, IMapperProfile
+    public class AutoMapperConfiguration : Profile, IOrderedMapperProfile
     {
         public AutoMapperConfiguration()
         {

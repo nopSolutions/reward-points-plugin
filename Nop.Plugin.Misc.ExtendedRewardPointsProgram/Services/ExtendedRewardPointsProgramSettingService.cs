@@ -19,7 +19,7 @@ namespace Nop.Plugin.Misc.ExtendedRewardPointsProgram.Services
 
         public ExtendedRewardPointsProgramSettingService(IStaticCacheManager cacheManager,
             IEventPublisher eventPublisher,
-            IRepository<Setting> settingRepository) : base(cacheManager, eventPublisher, settingRepository) 
+            IRepository<Setting> settingRepository) : base(eventPublisher, settingRepository, cacheManager ) 
         {
         }
 

@@ -47,16 +47,16 @@
                     <span asp-validation-for="Points"></span>
                 </div>
             </div>
-            @if (Model is RewardPointsForFastPurchaseModel)
+            @if (Model.Minutes != null)
             {
                 <div class="form-group">
                     <div class="col-md-3">
-                        <nop-override-store-checkbox asp-for="@(((RewardPointsForFastPurchaseModel) Model).Minutes_OverrideForStore)" asp-input="@(((RewardPointsForFastPurchaseModel) Model).Minutes)" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
-                        <nop-label asp-for="@(((RewardPointsForFastPurchaseModel) Model).Minutes)" />
+                        <nop-override-store-checkbox asp-for="@(Model.Minutes_OverrideForStore)" asp-input="@(Model.Minutes)" asp-store-scope="@Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="@(Model.Minutes)" />
                     </div>
                     <div class="col-md-9">
-                        <nop-editor asp-for="@(((RewardPointsForFastPurchaseModel) Model).Minutes)"/>
-                        <span asp-validation-for="@(((RewardPointsForFastPurchaseModel) Model).Minutes)"></span>
+                        <nop-editor asp-for="@(Model.Minutes)"/>
+                        <span asp-validation-for="@(Model.Minutes)"></span>
                     </div>
                 </div>
             }
